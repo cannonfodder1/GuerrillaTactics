@@ -4,4 +4,7 @@ class X2DownloadableContentInfo_GuerrillaTactics extends X2DownloadableContentIn
 static event OnPostTemplatesCreated()
 {
 	`log("GuerrillaTactics :: Present and Correct");
+
+	class'GuerrillaTactics_WeaponManager'.static.LoadWeaponProfiles();
+	class'GuerrillaTactics_WeaponManager'.static.LoadArmorProfiles();
 }
