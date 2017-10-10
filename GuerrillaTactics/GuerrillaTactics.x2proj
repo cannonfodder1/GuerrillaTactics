@@ -18,11 +18,38 @@
     <Content Include="Config\XComGame.ini">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Config\XComGWWeapons.ini">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Localization\XComGame.int">
       <SubType>Content</SubType>
     </Content>
     <Content Include="ReadMe.txt" />
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_AbilityManager.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_WeaponManager.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2AbilityCost_BurstAmmoCost.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2AbilityTag.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2AbilityToHitCalc_StandardAim.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Ability_ItemGrantedAbilitySet.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Ability_StandardShooting.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Effect_AmbientSuppression.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Effect_ConditionalGraze.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\GuerrillaTactics\Classes\X2DownloadableContentInfo_GuerrillaTactics.uc">
