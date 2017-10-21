@@ -7,6 +7,7 @@ static event OnPostTemplatesCreated()
 
 	class'GuerrillaTactics_WeaponManager'.static.LoadWeaponProfiles();
 	class'GuerrillaTactics_WeaponManager'.static.LoadArmorProfiles();
+	class'GuerrillaTactics_CharacterManager'.static.UpdateCharacterProfiles();
 }
 
 

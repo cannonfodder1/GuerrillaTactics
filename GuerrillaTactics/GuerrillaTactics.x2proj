@@ -28,6 +28,9 @@
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_AbilityManager.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_CharacterManager.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_WeaponManager.uc">
       <SubType>Content</SubType>
     </Content>
@@ -41,6 +44,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Ability_ItemGrantedAbilitySet.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Ability_Mobility.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Ability_StandardShooting.uc">
