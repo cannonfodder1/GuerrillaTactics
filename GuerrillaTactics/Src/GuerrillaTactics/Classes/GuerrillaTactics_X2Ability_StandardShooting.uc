@@ -21,7 +21,6 @@ static function array<X2DataTemplate> CreateTemplates()
   AddShotPair(Templates, 'GT_OverwatchSnapShot', 'GT_OverwatchSnapFollowShot', 1, eGT_FireMode_Snap, true);
 
   Templates.AddItem(AmbientSuppressionCancel());
-  Templates.AddItem(AddAnimationAbility());
   Templates.AddItem(WeaponConditionalGraze());
 
   return Templates;
@@ -49,7 +48,6 @@ static function AddShotPair(
   }
   else
   {
-		Template.PostActivationEvents.AddItem('GT_FinaliseAnimation');
   }
   Templates.AddItem(Template);
 
@@ -439,7 +437,8 @@ static function X2AbilityTemplate AddFollowShot(
 
   // MAKE IT LIVE!
   Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-  Template.BuildVisualizationFn = FollowShot_BuildVisualization;
+  Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+	Template.MergeVisualizationFn = GT_Shooting_MergeVisualization;
   Template.BuildInterruptGameStateFn = TypicalAbility_BuildInterruptGameState;
 
   Template.bDisplayInUITooltip = false;
@@ -461,41 +460,6 @@ static function X2AbilityTemplate AddFollowShot(
 
   return Template;	
 }
-
-
-simulated function FollowShot_BuildVisualization(XComGameState VisualizeGameState)
-{
-	local XComGameStateVisualizationMgr VisMgr;
-	local XComGameStateHistory History;
-	local XComGameStateContext_Ability Context;
-	local VisualizationActionMetadata ShadowMetaData, CosmeticUnitMetaData;
-	local XComGameState_Unit ShadowUnit, ShadowbindTargetUnit, TargetUnitState, CosmeticUnit;
-	local UnitValue ShadowUnitValue;
-	local X2Effect_SpawnShadowbindUnit SpawnShadowEffect;
-	local int j;
-	local name SpawnShadowEffectResult;
-	local X2Action_Fire SourceFire;
-	local X2Action_MoveBegin SourceMoveBegin;
-	local Actor SourceUnit;
-	local array<X2Action> TransformStopParents;
-	local VisualizationActionMetadata SourceMetaData, TargetMetaData;
-	local X2Action_ExitCover ExitCoverAction;
-	local X2Action_EnterCover EnterCoverAction;
-	local XComGameState_Item ItemState;
-
-	TypicalAbility_BuildVisualization(VisualizeGameState);
-
-	VisMgr = `XCOMVISUALIZATIONMGR;
-	History = `XCOMHISTORY;
-
-	Context = XComGameStateContext_Ability(VisualizeGameState.GetContext());
-
-	ExitCoverAction = X2Action_ExitCover(VisMgr.GetNodeOfType(VisMgr.BuildVisTree, class'X2Action_ExitCover', , Context.InputContext.PrimaryTarget.ObjectID));
-	VisMgr.DestroyAction(ExitCoverAction, true);
-	EnterCoverAction = X2Action_EnterCover(VisMgr.GetNodeOfType(VisMgr.BuildVisTree, class'X2Action_EnterCover', , Context.InputContext.PrimaryTarget.ObjectID));
-	VisMgr.DestroyAction(EnterCoverAction, true);
-}
-
 
 static function X2AbilityTemplate AddOverwatchAbility(
   name AbilityName,
@@ -585,33 +549,6 @@ static function X2AbilityTemplate AddOverwatchAbility(
 }
 
 
-static function EventListenerReturn SingleShotListener(Object EventData, Object EventSource, XComGameState GameState, Name EventID, Object CallbackData)
-{
-	local XComGameStateContext_Ability AbilityContext;
-  local XComGameState_Unit Shooter;
-	local XComGameState_Ability Ability, ShotAbility;
-  local XComGameStateHistory History;
-
-  History = `XCOMHISTORY;
-	AbilityContext = XComGameStateContext_Ability(GameState.GetContext());
-	if (AbilityContext != none)
-	{
-    Ability = XComGameState_Ability(
-      History.GetGameStateForObjectID(AbilityContext.InputContext.AbilityRef.ObjectID)
-    );
-    Shooter = XComGameState_Unit(
-      History.GetGameStateForObjectID(Ability.OwnerStateObject.ObjectID)
-    );
-    ShotAbility = XComGameState_Ability(
-      History.GetGameStateForObjectID(Shooter.FindAbility('GT_FinaliseAnimation').ObjectID)
-    );
-
-    ShotAbility.AbilityTriggerAgainstSingleTarget(AbilityContext.InputContext.PrimaryTarget, false);
-	}
-	return ELR_NoInterrupt;
-}
-
-
 
 static function EventListenerReturn MultiShotListener(Object EventData, Object EventSource, XComGameState GameState, Name EventID, Object CallbackData)
 {
@@ -651,105 +588,10 @@ static function EventListenerReturn MultiShotListener(Object EventData, Object E
   {
     // if we don't want a follow up shot or it failed (target dead), enter cover now (i.e. finalise)
 		`log("End shot");
-    ShotAbility = XComGameState_Ability(
-        History.GetGameStateForObjectID(Shooter.FindAbility('GT_FinaliseAnimation').ObjectID)
-    );
-    ShotAbility.AbilityTriggerAgainstSingleTarget(AbilityContext.InputContext.PrimaryTarget, false);
   }
 	return ELR_NoInterrupt;
 }
 
-
-// What is this? triggered against an enemy or self?
-// also, enter cover needs either major changes or the triggering code needs to be adjusted
-// since enter cover is responsible for speaking
-static function X2AbilityTemplate AddAnimationAbility()
-{
-  local X2AbilityTemplate                 Template;	
-  local X2Condition_Visibility            VisibilityCondition;
-  local X2AbilityTrigger_EventListener Trigger;
-
-  // Macro to do localisation and stuffs
-  `CREATE_X2ABILITY_TEMPLATE(Template, 'GT_FinaliseAnimation');
-
-  // Icon Properties
-	Template.AbilitySourceName = 'eAbilitySource_Standard';
-	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
-	Template.IconImage = "img:///UILibrary_PerkIcons.UIPerk_supression";
-	Template.ShotHUDPriority = class'UIUtilities_Tactical'.const.CLASS_LIEUTENANT_PRIORITY;
-	Template.bDisplayInUITooltip = false;
-	Template.bDisplayInUITacticalText = false;
-
-	// don't frame this -- entering cover isn't something exciting to look at 
-	Template.FrameAbilityCameraType = eCameraFraming_Never;
-
-
-  Trigger = new class'X2AbilityTrigger_EventListener';
-  Trigger.ListenerData.Deferral = ELD_OnStateSubmitted;
-  Trigger.ListenerData.EventID = 'GT_FinaliseAnimation';
-  Trigger.ListenerData.Filter = eFilter_Unit;
-  Trigger.ListenerData.EventFn = SingleShotListener;
-  Template.AbilityTriggers.AddItem(Trigger);
-
-  // Targeting Details
-  // Can only shoot visible enemies
-  VisibilityCondition = new class'X2Condition_Visibility';
-  VisibilityCondition.bRequireGameplayVisible = true;
-  VisibilityCondition.bAllowSquadsight = true;
-  Template.AbilityTargetConditions.AddItem(VisibilityCondition);
-  // Can't shoot while dead
-  Template.AbilityShooterConditions.AddItem(default.LivingShooterProperty);
-  // Only at single targets that are in range.
-  Template.AbilityTargetStyle = default.SimpleSingleTarget;
-
-  Template.AbilityTriggers.AddItem(Trigger);
-
-  // MAKE IT LIVE!
-  Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
-  Template.BuildVisualizationFn = Finalize_BuildVisualization;
-  Template.MergeVisualizationFn = GT_Shooting_MergeVisualization;
-  // cannot be interrupted
-//  Template.BuildInterruptGameStateFn = TypicalAbility_BuildInterruptGameState;
-
-  Template.bDisplayInUITooltip = false;
-  Template.bDisplayInUITacticalText = false;
-
-  Template.bUsesFiringCamera = true;
-  /* Template.CinescriptCameraType = "StandardGunFiring"; */	
-
-  return Template;	
-}
-
-
-simulated function Finalize_BuildVisualization(XComGameState VisualizeGameState)
-{
-	local XComGameStateVisualizationMgr VisMgr;
-	local XComGameStateHistory History;
-	local XComGameStateContext_Ability Context;
-	local VisualizationActionMetadata ShadowMetaData, CosmeticUnitMetaData;
-	local XComGameState_Unit ShadowUnit, ShadowbindTargetUnit, TargetUnitState, CosmeticUnit;
-	local UnitValue ShadowUnitValue;
-	local X2Effect_SpawnShadowbindUnit SpawnShadowEffect;
-	local int j;
-	local name SpawnShadowEffectResult;
-	local X2Action_Fire SourceFire;
-	local X2Action_MoveBegin SourceMoveBegin;
-	local Actor SourceUnit;
-	local array<X2Action> TransformStopParents;
-	local VisualizationActionMetadata SourceMetaData, TargetMetaData;
-	local X2Action_ExitCover ExitCoverAction;
-	local X2Action_EnterCover EnterCoverAction;
-
-	TypicalAbility_BuildVisualization(VisualizeGameState);
-
-	VisMgr = `XCOMVISUALIZATIONMGR;
-	History = `XCOMHISTORY;
-
-	Context = XComGameStateContext_Ability(VisualizeGameState.GetContext());
-
-	ExitCoverAction = X2Action_ExitCover(VisMgr.GetNodeOfType(VisMgr.BuildVisTree, class'X2Action_ExitCover', , Context.InputContext.PrimaryTarget.ObjectID));
-	VisMgr.DestroyAction(ExitCoverAction, true);
-}
 
 
 //	e.g. Rapid Fire, Chain Shot, Banish
@@ -758,17 +600,46 @@ simulated function GT_Shooting_MergeVisualization(X2Action BuildTree, out X2Acti
 	local XComGameStateVisualizationMgr VisMgr;
 	local Array<X2Action> arrActions;
 	local X2Action_MarkerTreeInsertBegin MarkerStart;
+	local X2Action_Fire FireAction;
 	local X2Action_MarkerNamed MarkerNamed, JoinMarker, TrackerMarker;
-	local X2Action_ExitCover ExitCoverAction, FirstExitCoverAction;
-	local X2Action_EnterCover EnterCoverAction, LastEnterCoverAction;
 	local X2Action_WaitForAnotherAction WaitAction;
 	local VisualizationActionMetadata ActionMetadata;
 	local int i;
 	local int iBestHistoryIndex;
 
+	local X2Action_ApplyWeaponDamageToUnit DamageAction;
+	local X2Action_ApplyWeaponDamageToTerrain TerrainAction;
+	local X2Action_Death DeathAction;
+
 	VisMgr = `XCOMVISUALIZATIONMGR;
 	MarkerStart = X2Action_MarkerTreeInsertBegin(VisMgr.GetNodeOfType(BuildTree, class'X2Action_MarkerTreeInsertBegin'));
-	`log("GT_Shooting_MergeVisualization");
+	FireAction = X2Action_Fire(VisMgr.GetNodeOfType(VisualizationTree, class'X2Action_Fire'));
+
+	VisMgr.GetNodesOfType(BuildTree, class'X2Action_ApplyWeaponDamageToUnit', arrActions, , , true);
+	for (i = 0; i < arrActions.Length; ++i)
+	{
+		DamageAction = X2Action_ApplyWeaponDamageToUnit(arrActions[i]);
+		VisMgr.DisconnectAction(DamageAction);
+		VisMgr.ConnectAction(DamageAction, VisualizationTree, false, FireAction);
+	}
+
+	VisMgr.GetNodesOfType(BuildTree, class'X2Action_ApplyWeaponDamageToTerrain', arrActions, , , true);
+	for (i = 0; i < arrActions.Length; ++i)
+	{
+		TerrainAction = X2Action_ApplyWeaponDamageToTerrain(arrActions[i]);
+		VisMgr.DisconnectAction(TerrainAction);
+		VisMgr.ConnectAction(TerrainAction, VisualizationTree, false, FireAction);
+	}
+
+	VisMgr.GetNodesOfType(BuildTree, class'X2Action_Death', arrActions, , , true);
+	for (i = 0; i < arrActions.Length; ++i)
+	{
+		DeathAction = X2Action_Death(arrActions[i]);
+		VisMgr.DisconnectAction(DeathAction);
+		VisMgr.ConnectAction(DeathAction, VisualizationTree, false, FireAction);
+	}
+
+	VisMgr.DestroySubTree(BuildTree, true);
 }
 
 

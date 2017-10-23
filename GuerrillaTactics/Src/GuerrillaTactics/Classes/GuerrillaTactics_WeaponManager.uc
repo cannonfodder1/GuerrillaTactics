@@ -230,7 +230,6 @@ static function LoadWeaponProfiles ()
       WeaponTemplate.Abilities.RemoveItem('StandardShot');
       WeaponTemplate.Abilities.RemoveItem('SniperStandardFire');
       WeaponTemplate.Abilities.AddItem('GT_AmbientSuppressionCancel');
-      WeaponTemplate.Abilities.AddItem('GT_FinaliseAnimation');
 
       WeaponTemplate.Abilities.RemoveItem('Overwatch');
       WeaponTemplate.Abilities.RemoveItem('OverwatchShot');
