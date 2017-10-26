@@ -9,7 +9,13 @@
     <RootNamespace>GuerrillaTactics</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Config\XComAdventCOIN.ini">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Config\XComEditor.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Config\XComEncounterLists.ini">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Config\XComEngine.ini">
@@ -18,7 +24,25 @@
     <Content Include="Config\XComGame.ini">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Config\XComGameCore.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Config\XComGameData.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Config\XComGameData_CharacterStats.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Config\XComGameData_WeaponData.ini">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Config\XComGWWeapons.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Content\NewAdventWeapons.upk">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Content\TotalAdventWeaponry_ModShaderCache.upk">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Localization\XComGame.int">
@@ -29,6 +53,9 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_CharacterManager.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_ScrubMissionManager.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_WeaponManager.uc">
@@ -52,10 +79,16 @@
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Ability_StandardShooting.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Character_NewADVENT.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Effect_AmbientSuppression.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Effect_ConditionalGraze.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_X2Item_AdventWeaponry.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\GuerrillaTactics\Classes\X2DownloadableContentInfo_GuerrillaTactics.uc">

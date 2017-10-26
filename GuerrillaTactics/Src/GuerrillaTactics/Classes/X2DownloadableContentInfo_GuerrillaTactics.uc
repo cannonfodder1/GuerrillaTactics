@@ -8,6 +8,11 @@ static event OnPostTemplatesCreated()
 	class'GuerrillaTactics_WeaponManager'.static.LoadWeaponProfiles();
 	class'GuerrillaTactics_WeaponManager'.static.LoadArmorProfiles();
 	class'GuerrillaTactics_CharacterManager'.static.UpdateCharacterProfiles();
+
+
+  class'GuerrillaTactics_ScrubMissionManager'.static.ScrubInclusionExclusionLists();
+  class'GuerrillaTactics_ScrubMissionManager'.static.ReplaceConfigurableEncounterSpawns();
+  class'GuerrillaTactics_ScrubMissionManager'.static.UpdateAIJobs();
 }
 
 
