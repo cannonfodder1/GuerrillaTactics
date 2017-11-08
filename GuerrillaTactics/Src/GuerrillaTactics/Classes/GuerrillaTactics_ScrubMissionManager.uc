@@ -105,9 +105,10 @@ static function ScrubInclusionExclusionLists ()
     `log("ADVENTCOIN :: Scrubbing List - " @ SDList.ListID);
     for (WalkIx = SDList.SpawnDistribution.Length - 1; WalkIx > -1; WalkIx--)
     {
+			`log("- check" @ SDList.SpawnDistribution[WalkIx].Template);
       if (default.TemplateNamesToRemove.Find(SDList.SpawnDistribution[WalkIx].Template) != INDEX_NONE)
       {
-        `log("- removing" @ SDList.SpawnDistribution[WalkIx].Template);
+        `log("-- removing" @ SDList.SpawnDistribution[WalkIx].Template);
         MissionManager.SpawnDistributionLists[Ix].SpawnDistribution.Remove(WalkIx, 1);
       }
     }
@@ -127,9 +128,11 @@ static function ReplaceConfigurableEncounterSpawns ()
   `log("ADVENTCOIN :: Reworking ConfigurableEncounters");
   foreach MissionManager.ConfigurableEncounters(Encounter, Ix)
   {
+		`log("- " $ Encounter.EncounterID);
     for (WalkIx = Encounter.ForceSpawnTemplateNames.Length - 1; WalkIx > -1; WalkIx--)
     {
       OrigName = Encounter.ForceSpawnTemplateNames[WalkIx];
+			`log("-- " $ OrigName);
       ReplacementIx = default.AdventReplacements.Find('TemplateName', OrigName);
 
       if (ReplacementIx != INDEX_NONE)
