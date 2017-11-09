@@ -12,7 +12,6 @@ static event OnPostTemplatesCreated()
 
   class'GuerrillaTactics_ScrubMissionManager'.static.ScrubInclusionExclusionLists();
   class'GuerrillaTactics_ScrubMissionManager'.static.ReplaceConfigurableEncounterSpawns();
-  class'GuerrillaTactics_ScrubMissionManager'.static.UpdateAIJobs();
 }
 
 
