@@ -20,6 +20,7 @@ var config array<AdventCOIN_Replacement> AdventReplacements;
 var config array<AdventCOIN_AIJobInfo_Addition> JobListingAdditions; // Definition of qualifications for each job for this new character
 
 
+// need to change this into a screen listener
 static function UpdateAIJobs()
 {
 	local X2AIJobManager JobMgr;
@@ -31,7 +32,7 @@ static function UpdateAIJobs()
 	local name MyName;
 
 	//retrieve Managers
-	JobMgr = `AIJOBMGR;
+	JobMgr = class'X2AIJobManager'.static.GetAIJobManager();
 	CharacterMgr = class'X2CharacterTemplateManager'.static.GetCharacterTemplateManager();
 
 	//for debugging, to verify that the AIJobManager is alive and has data
@@ -52,6 +53,7 @@ static function UpdateAIJobs()
 		//JobInfo = JobMgr.GetJobListing(Addition.JobName);
 		JobIdx = JobMgr.JobListings.Find('JobName', Addition.JobName);
 
+    `log("ADVENTCOIN :: JobName-" $ Addition.JobName $ " :: JobIdx: " $ JobIdx);
 		if(JobMgr.JobListings[JobIdx].JobName == '') 
 		{
 			`REDSCREEN("UpdateAIJobs : Invalid job name = " $ Addition.JobName);
