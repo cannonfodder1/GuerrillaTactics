@@ -58,6 +58,9 @@
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_ScrubMissionManager.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_UIScreenListener_AdventCOIN.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_WeaponManager.uc">
       <SubType>Content</SubType>
     </Content>
