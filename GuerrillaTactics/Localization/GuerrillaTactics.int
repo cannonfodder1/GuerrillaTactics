@@ -5,3 +5,6 @@ OverwatchFlyOver="Overwatch"
 
 [GuerrillaTactics_X2Ability_Grenades]
 PrimedGrenadeFlyOver="Primed Grenade"
+
+[GuerrillaTactics_X2AbilityToHitCalc_StandardAim]
+RecoilModifierTag="Weapon Recoil"

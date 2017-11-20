@@ -182,6 +182,7 @@ static function X2AbilityTemplate AddShotType(
   local X2AbilityTrigger_Event            EventTrigger;
   local X2Effect_Knockback				KnockbackEffect;
   local GuerrillaTactics_X2Effect_AmbientSuppression SuppressionEffect;
+	local GuerrillaTactics_X2Effect_Recoil RecoilEffect;
   local X2Condition_Visibility            VisibilityCondition;
   local GuerrillaTactics_X2AbilityToHitCalc_StandardAim    ToHitCalc;
 
@@ -315,6 +316,11 @@ static function X2AbilityTemplate AddShotType(
     Template.AddTargetEffect(SuppressionEffect);
   }
 
+	RecoilEffect = new class'GuerrillaTactics_X2Effect_Recoil';
+	RecoilEffect.FireMode = FireMode;
+	Template.AddShooterEffect(RecoilEffect);
+
+
   ToHitCalc = new class'GuerrillaTactics_X2AbilityToHitCalc_StandardAim';
   ToHitCalc.FireMode = FireMode;
   if (bOverwatch) { ToHitCalc.bReactionFire = true; }
@@ -384,6 +390,7 @@ static function X2AbilityTemplate AddFollowShot(
   local X2Effect_Knockback				KnockbackEffect;
   local X2Condition_Visibility            VisibilityCondition;
   local X2AbilityTrigger_EventListener  Trigger;
+	local GuerrillaTactics_X2Effect_Recoil RecoilEffect;
 	local GuerrillaTactics_X2AbilityToHitCalc_StandardAim    ToHitCalc;
 
   // Macro to do localisation and stuffs
@@ -421,6 +428,10 @@ static function X2AbilityTemplate AddFollowShot(
   //  Various Soldier ability specific effects - effects check for the ability before applying
   Template.AddTargetEffect(class'X2Ability_GrenadierAbilitySet'.static.ShredderDamageEffect());
 	Template.AddTargetEffect(default.WeaponUpgradeMissDamage);
+
+	RecoilEffect = new class'GuerrillaTactics_X2Effect_Recoil';
+	RecoilEffect.FireMode = FireMode;
+	Template.AddShooterEffect(RecoilEffect);
 
 	Trigger = new class'X2AbilityTrigger_EventListener';
 	Trigger.ListenerData.Deferral = ELD_OnStateSubmitted;

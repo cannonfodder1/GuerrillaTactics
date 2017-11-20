@@ -1,6 +1,7 @@
 class GuerrillaTactics_X2AbilityToHitCalc_StandardAim extends X2AbilityToHitCalc_StandardAim;
 
 var eGT_FireMode FireMode;
+var localized string RecoilModifierTag;
 
 protected function int GetHitChance(XComGameState_Ability kAbility, AvailableTarget kTarget, optional out ShotBreakdown m_ShotBreakdown, optional bool bDebugLog = false)
 {
@@ -26,6 +27,7 @@ protected function int GetHitChance(XComGameState_Ability kAbility, AvailableTar
 	local TTile UnitTileLocation, TargetTileLocation;
 	local ECoverType NextTileOverCoverType;
 	local int TileDistance;
+	local float RecoilScore;
 
 	local int OverwatchAimModifier;
 
@@ -136,6 +138,13 @@ protected function int GetHitChance(XComGameState_Ability kAbility, AvailableTar
 					iRangeCritModifier = GetWeaponRangeCritModifier(UnitState, TargetState, SourceWeapon);
 					AddModifier(iRangeCritModifier, class'XLocalizedData'.default.WeaponRange, m_ShotBreakdown, eHit_Crit, bDebugLog);
 				}			
+
+				// weapon recoil
+				UnitState.GetUnitValue('GT_Recoil', RecoilScore);
+				if (RecoilScore > 0) {
+					AddModifier(Round(RecoilScore), RecoilModifierTag, m_ShotBreakdown, eHit_Success, bDebugLog);
+				}
+
 				//  Cover modifiers
 				if (bMeleeAttack)
 				{
@@ -399,6 +408,7 @@ function int GetWeaponRangeAimModifier(XComGameState_Unit Shooter, XComGameState
 
 	return 0;
 }
+
 
 function int GetWeaponRangeCritModifier(XComGameState_Unit Shooter, XComGameState_Unit Target, XComGameState_Item Weapon)
 {

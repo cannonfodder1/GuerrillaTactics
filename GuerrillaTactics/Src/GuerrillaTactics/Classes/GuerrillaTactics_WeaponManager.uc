@@ -29,6 +29,7 @@ struct GuerrillaTacticsShotProfile
 	var int ShotCount;
 	var int SuppressionPower;
 	var int SuppressionRadius;
+	var float Recoil;
 	// 1,6,11,16,21,26,31,36,41,46 - ranges in array, fall off with modifier after range
 	var array<int> Aim;
 	var array<int> Crit;
@@ -100,6 +101,26 @@ static function int GetShotCount(name WeaponName, eGT_FireMode FireMode)
     
     case eGT_FireMode_Volume:
     return WeaponProfile.Volume.ShotCount;
+  }
+  return 0;
+}
+
+static function float GetRecoil(name WeaponName, eGT_FireMode FireMode)
+{
+  local GuerrillaTacticsWeaponProfile WeaponProfile;
+
+  WeaponProfile = GetWeaponProfile(WeaponName);
+
+  switch (FireMode)
+  {
+    case eGT_FireMode_Snap:
+    return WeaponProfile.Recoil;
+
+    case eGT_FireMode_Aimed:
+    return WeaponProfile.Recoil;
+    
+    case eGT_FireMode_Volume:
+    return WeaponProfile.Recoil;
   }
   return 0;
 }
