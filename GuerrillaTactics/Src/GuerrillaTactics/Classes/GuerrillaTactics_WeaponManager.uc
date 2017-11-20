@@ -27,10 +27,17 @@ struct GuerrillaTacticsGrazeProfile
 struct GuerrillaTacticsShotProfile
 {
 	var int ShotCount;
-	var int SuppressionPenalty;
-	var int AimModifier;
-	var int CritModifier;
+	var int SuppressionPower;
+	var int SuppressionRadius;
+	// 1,6,11,16,21,26,31,36,41,46 - ranges in array, fall off with modifier after range
+	var array<int> Aim;
+	var array<int> Crit;
 	var GuerrillaTacticsGrazeProfile GrazeModifier;
+
+	structdefaultproperties
+	{
+		SuppressionRadius = 1;
+	}
 };
 
 struct GuerrillaTacticsWeaponProfile
@@ -38,6 +45,7 @@ struct GuerrillaTacticsWeaponProfile
 	var name WeaponName;
 	var int iClipSize;
 	var WeaponDamageValue BulletProfile;
+	var bool DontLoadAbilities;
 	var int OverwatchAimModifier;
 	var GuerrillaTacticsGrazeProfile DefaultGrazeModifier;
 	var GuerrillaTacticsShotProfile Aimed;
@@ -106,49 +114,97 @@ static function int GetOverwatchAimModifier(name WeaponName)
 }
 
 
-static function int GetAimModifier(name WeaponName, eGT_FireMode FireMode)
+static function int GetAimModifier(name WeaponName, eGT_FireMode FireMode, int Range)
 {
   local GuerrillaTacticsWeaponProfile WeaponProfile;
+	local Array<int> AimList;
+	local int TileIndex;
+	local int BaseMod, InterpGap;
+	local float TileFloat, TileInterp;
 
   WeaponProfile = GetWeaponProfile(WeaponName);
 
   switch (FireMode)
   {
     case eGT_FireMode_Snap:
-    return WeaponProfile.Snap.AimModifier;
+    AimList = WeaponProfile.Snap.Aim;
+		break;
 
     case eGT_FireMode_Aimed:
-    return WeaponProfile.Aimed.AimModifier;
+    AimList = WeaponProfile.Aimed.Aim;
+		break;
     
     case eGT_FireMode_Volume:
-    return WeaponProfile.Volume.AimModifier;
+    AimList = WeaponProfile.Volume.Aim;
+		break;
   }
+
+	TileFloat = Range / 5.0;
+	TileInterp = TileFloat % 1.0;
+	TileIndex = TileFloat;
+
+	if (TileIndex < AimList.Length) {
+		BaseMod = AimList[TileIndex];
+		if (TileIndex + 1 < AimList.Length) {
+			InterpGap = AimList[TileIndex] - AimList[TileIndex + 1];
+			return Round(BaseMod + (InterpGap * TileInterp));
+		} else {
+			return BaseMod;
+		}
+	} else {
+		return AimList[AimList.Length - 1];
+	}
+
   return 0;
 }
 
 
-static function int GetCritModifier(name WeaponName, eGT_FireMode FireMode)
+static function int GetCritModifier(name WeaponName, eGT_FireMode FireMode, int Range)
 {
   local GuerrillaTacticsWeaponProfile WeaponProfile;
+	local Array<int> CritList;
+	local int TileIndex;
+	local int BaseMod, InterpGap;
+	local float TileFloat, TileInterp;
 
   WeaponProfile = GetWeaponProfile(WeaponName);
 
   switch (FireMode)
   {
     case eGT_FireMode_Snap:
-    return WeaponProfile.Snap.CritModifier;
+    CritList = WeaponProfile.Snap.Crit;
+		break;
 
     case eGT_FireMode_Aimed:
-    return WeaponProfile.Aimed.CritModifier;
+    CritList = WeaponProfile.Aimed.Crit;
+		break;
     
     case eGT_FireMode_Volume:
-    return WeaponProfile.Volume.CritModifier;
+    CritList = WeaponProfile.Volume.Crit;
+		break;
   }
+
+	TileFloat = Range / 5.0;
+	TileInterp = TileFloat % 1.0;
+	TileIndex = TileFloat;
+
+	if (TileIndex < CritList.Length) {
+		BaseMod = CritList[TileIndex];
+		if (TileIndex + 1 < CritList.Length) {
+			InterpGap = CritList[TileIndex] - CritList[TileIndex + 1];
+			return Round(BaseMod + (InterpGap * TileInterp));
+		} else {
+			return BaseMod;
+		}
+	} else {
+		return CritList[CritList.Length - 1];
+	}
+
   return 0;
 }
 
 
-static function int GetSuppressionPenalty(name WeaponName, eGT_FireMode FireMode)
+static function int GetSuppressionPower(name WeaponName, eGT_FireMode FireMode)
 {
   local GuerrillaTacticsWeaponProfile WeaponProfile;
 
@@ -157,13 +213,13 @@ static function int GetSuppressionPenalty(name WeaponName, eGT_FireMode FireMode
   switch (FireMode)
   {
     case eGT_FireMode_Snap:
-    return WeaponProfile.Snap.SuppressionPenalty;
+    return WeaponProfile.Snap.SuppressionPower;
 
     case eGT_FireMode_Aimed:
-    return WeaponProfile.Aimed.SuppressionPenalty;
+    return WeaponProfile.Aimed.SuppressionPower;
     
     case eGT_FireMode_Volume:
-    return WeaponProfile.Volume.SuppressionPenalty;
+    return WeaponProfile.Volume.SuppressionPower;
   }
   return 0;
 }
@@ -227,40 +283,43 @@ static function LoadWeaponProfiles ()
       WeaponTemplate.BaseDamage = WeaponProfile.BulletProfile;
       WeaponTemplate.iClipSize = WeaponProfile.iClipSize;
 
-      WeaponTemplate.Abilities.RemoveItem('StandardShot');
-      WeaponTemplate.Abilities.RemoveItem('SniperStandardFire');
-      WeaponTemplate.Abilities.AddItem('GT_AmbientSuppressionCancel');
+			if (!WeaponProfile.DontLoadAbilities)
+			{
+				WeaponTemplate.Abilities.RemoveItem('StandardShot');
+				WeaponTemplate.Abilities.RemoveItem('SniperStandardFire');
+				WeaponTemplate.Abilities.AddItem('GT_AmbientSuppressionCancel');
 
-      WeaponTemplate.Abilities.RemoveItem('Overwatch');
-      WeaponTemplate.Abilities.RemoveItem('OverwatchShot');
-      WeaponTemplate.Abilities.RemoveItem('SniperRifleOverwatch');
+				WeaponTemplate.Abilities.RemoveItem('Overwatch');
+				WeaponTemplate.Abilities.RemoveItem('OverwatchShot');
+				WeaponTemplate.Abilities.RemoveItem('SniperRifleOverwatch');
 
-      WeaponTemplate.Abilities.AddItem('GT_OverwatchSnap');
-      WeaponTemplate.Abilities.AddItem('GT_OverwatchSnapShot');
-      WeaponTemplate.Abilities.AddItem('GT_OverwatchSnapFollowShot');
+				WeaponTemplate.Abilities.AddItem('GT_OverwatchSnap');
+				WeaponTemplate.Abilities.AddItem('GT_OverwatchSnapShot');
+				WeaponTemplate.Abilities.AddItem('GT_OverwatchSnapFollowShot');
 
-      if (WeaponProfile.DefaultGrazeModifier.High != -1)
-      {
-        WeaponTemplate.Abilities.AddItem('GT_WeaponConditionalGraze');
-      }
+				if (WeaponProfile.DefaultGrazeModifier.High != -1)
+				{
+					WeaponTemplate.Abilities.AddItem('GT_WeaponConditionalGraze');
+				}
 
-      if (WeaponProfile.Aimed.ShotCount > 0)
-      {
-        WeaponTemplate.Abilities.AddItem('GT_AimedShot');
-        WeaponTemplate.Abilities.AddItem('GT_AimedFollowShot');
-      }
+				if (WeaponProfile.Aimed.ShotCount > 0)
+				{
+					WeaponTemplate.Abilities.AddItem('GT_AimedShot');
+					WeaponTemplate.Abilities.AddItem('GT_AimedFollowShot');
+				}
 
-      if (WeaponProfile.Snap.ShotCount > 0)
-      {
-        WeaponTemplate.Abilities.AddItem('GT_SnapShot');
-        WeaponTemplate.Abilities.AddItem('GT_SnapFollowShot');
-      }
+				if (WeaponProfile.Snap.ShotCount > 0)
+				{
+					WeaponTemplate.Abilities.AddItem('GT_SnapShot');
+					WeaponTemplate.Abilities.AddItem('GT_SnapFollowShot');
+				}
 
-      if (WeaponProfile.Volume.ShotCount > 0)
-      {
-        WeaponTemplate.Abilities.AddItem('GT_VolumeShot');
-        WeaponTemplate.Abilities.AddItem('GT_VolumeFollowShot');
-      }
+				if (WeaponProfile.Volume.ShotCount > 0)
+				{
+					WeaponTemplate.Abilities.AddItem('GT_VolumeShot');
+					WeaponTemplate.Abilities.AddItem('GT_VolumeFollowShot');
+				}
+			}
     }
   }
 }

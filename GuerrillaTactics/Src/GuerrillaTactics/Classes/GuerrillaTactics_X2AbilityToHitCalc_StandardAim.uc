@@ -8,7 +8,7 @@ protected function int GetHitChance(XComGameState_Ability kAbility, AvailableTar
 	local XComGameState_Item SourceWeapon;
 	local GameRulesCache_VisibilityInfo VisInfo;
 	local array<X2WeaponUpgradeTemplate> WeaponUpgrades;
-	local int i, iWeaponMod, iRangeModifier, Tiles;
+	local int i, iWeaponMod, iRangeModifier, iRangeCritModifier, Tiles;
 	local ShotBreakdown EmptyShotBreakdown;
 	local array<ShotModifierInfo> EffectModifiers;
 	local StateObjectReference EffectRef;
@@ -27,7 +27,7 @@ protected function int GetHitChance(XComGameState_Ability kAbility, AvailableTar
 	local ECoverType NextTileOverCoverType;
 	local int TileDistance;
 
-	local int WeaponCritModifier, WeaponAimModifier, OverwatchAimModifier;
+	local int OverwatchAimModifier;
 
 	`log("=" $ GetFuncName() $ "=", bDebugLog, 'XCom_HitRolls');
 
@@ -130,8 +130,11 @@ protected function int GetHitChance(XComGameState_Ability kAbility, AvailableTar
 				//  Add weapon range
 				if (SourceWeapon != none)
 				{
-					iRangeModifier = GetWeaponRangeModifier(UnitState, TargetState, SourceWeapon);
+					iRangeModifier = GetWeaponRangeAimModifier(UnitState, TargetState, SourceWeapon);
 					AddModifier(iRangeModifier, class'XLocalizedData'.default.WeaponRange, m_ShotBreakdown, eHit_Success, bDebugLog);
+
+					iRangeCritModifier = GetWeaponRangeCritModifier(UnitState, TargetState, SourceWeapon);
+					AddModifier(iRangeCritModifier, class'XLocalizedData'.default.WeaponRange, m_ShotBreakdown, eHit_Crit, bDebugLog);
 				}			
 				//  Cover modifiers
 				if (bMeleeAttack)
@@ -358,8 +361,8 @@ protected function int GetHitChance(XComGameState_Ability kAbility, AvailableTar
 		AddModifier(-int(FinalAdjust), AbilityTemplate.LocFriendlyName, m_ShotBreakdown, eHit_Success, bDebugLog);
 		AddReactionFlatModifier(UnitState, TargetState, m_ShotBreakdown, bDebugLog);
 
-    OverwatchAimModifier = class'GuerrillaTactics_WeaponManager'.static.GetAimModifier(
-      SourceWeapon.GetMyTemplateName(), FireMode
+    OverwatchAimModifier = class'GuerrillaTactics_WeaponManager'.static.GetOverwatchAimModifier(
+      SourceWeapon.GetMyTemplateName()
     );
     if (OverwatchAimModifier != 0)
     {
@@ -372,22 +375,47 @@ protected function int GetHitChance(XComGameState_Ability kAbility, AvailableTar
 		AddModifier(-int(FinalAdjust), AbilityTemplate.LocFriendlyName, m_ShotBreakdown, eHit_Success, bDebugLog);
 	}
 
-  WeaponAimModifier = class'GuerrillaTactics_WeaponManager'.static.GetAimModifier(
-    SourceWeapon.GetMyTemplateName(), FireMode
-  );
-  if (WeaponAimModifier != 0)
-  {
-    AddModifier(WeaponAimModifier, AbilityTemplate.LocFriendlyName, m_ShotBreakdown, eHit_Success);
-  }
-
-  WeaponCritModifier = class'GuerrillaTactics_WeaponManager'.static.GetCritModifier(
-    SourceWeapon.GetMyTemplateName(), FireMode
-  );
-  if (WeaponCritModifier != 0)
-  {
-    AddModifier(WeaponCritModifier, AbilityTemplate.LocFriendlyName, m_ShotBreakdown, eHit_Crit);
-  }
-
 	FinalizeHitChance(m_ShotBreakdown, bDebugLog);
 	return m_ShotBreakdown.FinalHitChance;
+}
+
+
+function int GetWeaponRangeAimModifier(XComGameState_Unit Shooter, XComGameState_Unit Target, XComGameState_Item Weapon)
+{
+	local int Tiles;
+	local int WeaponAimModifier;
+
+	if (Shooter != none && Target != none && Weapon != none)
+	{
+		Tiles = Shooter.TileDistanceBetween(Target);
+		WeaponAimModifier = class'GuerrillaTactics_WeaponManager'.static.GetAimModifier(
+			Weapon.GetMyTemplateName(), FireMode, Tiles
+		);
+		if (WeaponAimModifier != 0)
+		{
+			return WeaponAimModifier;
+		}
+	}
+
+	return 0;
+}
+
+function int GetWeaponRangeCritModifier(XComGameState_Unit Shooter, XComGameState_Unit Target, XComGameState_Item Weapon)
+{
+	local int Tiles;
+	local int WeaponCritModifier;
+
+	if (Shooter != none && Target != none && Weapon != none)
+	{
+		Tiles = Shooter.TileDistanceBetween(Target);
+		WeaponCritModifier = class'GuerrillaTactics_WeaponManager'.static.GetCritModifier(
+			Weapon.GetMyTemplateName(), FireMode, Tiles
+		);
+		if (WeaponCritModifier != 0)
+		{
+			return WeaponCritModifier;
+		}
+	}
+
+	return 0;
 }

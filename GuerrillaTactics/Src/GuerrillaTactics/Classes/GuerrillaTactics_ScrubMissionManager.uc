@@ -98,7 +98,7 @@ static function ScrubInclusionExclusionLists ()
 {
   local SpawnDistributionList SDList;
   local XComTacticalMissionManager MissionManager;
-  local int Ix, WalkIx, PatchIx;
+  local int Ix, WalkIx;
 
   MissionManager = `TACTICALMISSIONMGR;
 

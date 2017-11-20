@@ -26,9 +26,9 @@ function int GetAimModifierFromAbility(XComGameState_Ability SourceAbility)
 	ItemState = SourceAbility.GetSourceWeapon();
 	WeaponName = ItemState.GetMyTemplateName();
 	
-  return class'GuerrillaTactics_WeaponManager'.static.GetSuppressionPenalty(
+  return class'GuerrillaTactics_WeaponManager'.static.GetSuppressionPower(
     WeaponName, FireMode
-  );
+  ) * -1;
 }
 
 
