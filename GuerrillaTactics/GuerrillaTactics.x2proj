@@ -12,6 +12,9 @@
     <Content Include="Config\XComAdventCOIN.ini">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Config\XComAI.ini">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Config\XComEditor.ini">
       <SubType>Content</SubType>
     </Content>
@@ -45,10 +48,16 @@
     <Content Include="Content\TotalAdventWeaponry_ModShaderCache.upk">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Localization\GuerrillaTactics.int">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Localization\XComGame.int">
       <SubType>Content</SubType>
     </Content>
     <Content Include="ReadMe.txt" />
+    <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_ScreenListener_ActivateAllPods.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\GuerrillaTactics\Classes\GuerrillaTactics_AbilityManager.uc">
       <SubType>Content</SubType>
     </Content>
