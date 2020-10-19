@@ -1,5 +1,5 @@
 [GuerrillaTactics_X2Ability_StandardShooting]
-SuppressionTargetEffectName="Incoming Fire"
+SuppressionTargetEffectName="Suppression Fire"
 SuppressionTargetEffectDesc="Suffering <Ability:AmbientSuppressionPenalty/> penalty to aim from incoming fire."
 OverwatchFlyOver="Overwatch"
 
